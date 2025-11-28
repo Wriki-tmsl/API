@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Wishlist - Library Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+    <header>
+        <h1>My Wishlist</h1>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </header>
+    <main>
+        <section>
+            <h2>Add Book to Wishlist</h2>
+            <form method="post" action="{{ url_for('add_to_wishlist') }}">
+                <input type="number" name="book_id" placeholder="Book ID" required>
+                <button type="submit">Add</button>
+            </form>
+        </section>
+        <section>
+            <h2>Your Wishlist</h2>
+            {% if wishlist %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Book ID</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in wishlist %}
+                    <tr>
+                        <td>{{ book.id }}</td>
+                        <td>{{ book.title }}</td>
+                        <td>{{ book.author }}</td>
+                        <td>
+                            <form method="post" action="{{ url_for('remove_from_wishlist') }}">
+                                <input type="hidden" name="book_id" value="{{ book.id }}">
+                                <button type="submit">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p>Your wishlist is empty.</p>
+            {% endif %}
+        </section>
+        <a href="{{ url_for('book_catalogue') }}">Back to Catalogue</a>
+    </main>

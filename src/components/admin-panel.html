@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel - Library Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Admin Panel</h1>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </header>
+    <main>
+        <h2>User Management</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Librarian</th>
+                    <th>Admin</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ 'Yes' if user.is_librarian else 'No' }}</td>
+                    <td>{{ 'Yes' if user.is_admin else 'No' }}</td>
+                    <td>
+                        {% if not user.is_librarian %}
+                        <form method="post" action="{{ url_for('make_librarian', user_id=user.id) }}" style="display:inline;">
+                            <button type="submit">Make Librarian</button>
+                        </form>
+                        {% else %}
+                        <form method="post" action="{{ url_for('remove_librarian', user_id=user.id) }}" style="display:inline;">
+                            <button type="submit">Remove Librarian</button>
+                        </form>
+                        {% endif %}
+                        {% if not user.is_admin %}
+                        <form method="post" action="{{ url_for('delete_user', user_id=user.id) }}" style="display:inline;">
+                            <button type="submit">Delete User</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{{ url_for('book_catalogue') }}">Back to Catalogue</a>
+    </main>
+</body>
+</html>

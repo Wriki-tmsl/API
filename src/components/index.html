@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Library Management System Portfolio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+    <main class="lms-showcase">
+        <h2>Welcome to the Library Management System Portfolio</h2>
+        <ul>
+            {% if session.user_id %}
+                <li>Hello, {{ session.user_name }}!</li>
+                <li><a href="{{ url_for('user_profile') }}">User Profile</a></li>
+                <li><a href="{{ url_for('book_catalogue') }}">Book Catalogue</a></li>
+                <li><a href="{{ url_for('wishlist') }}">My Wishlist</a></li>
+                {% if session.is_librarian %}
+                    <li><a href="{{ url_for('librarian_dashboard') }}">Librarian Dashboard</a></li>
+                {% endif %}
+                {% if session.is_admin %}
+                    <li><a href="{{ url_for('admin_panel') }}">Admin Panel</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+                <li><a href="{{ url_for('book_catalogue') }}">Book Catalogue</a></li>
+            {% endif %}
+        </ul>
+    </main>
+</body>
+</html>

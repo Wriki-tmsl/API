@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Catalogue - Library Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Book Catalogue</h1>
+        {% if session.user_id %}
+            <a href="{{ url_for('wishlist') }}">My Wishlist</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+        {% endif %}
+    </header>
+    <main class="lms-showcase">
+        <table class="profile-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>ISBN</th>
+                    <th>Library</th>
+                    <th>Available Copies</th>
+                    {% if session.user_id %}
+                    <th>Add to Wishlist</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                <tr>
+                    <td>{{ book.title }}</td>
+                    <td>{{ book.author }}</td>
+                    <td>{{ book.isbn }}</td>
+                    <td>{{ book.library }}</td>
+                    <td>{{ book.quantity }}</td>
+                    {% if session.user_id %}
+                    <td>
+                        <form method="post" action="{{ url_for('add_to_wishlist') }}">
+                            <input type="hidden" name="book_id" value="{{ book.id }}">
+                            <button type="submit">Add to Wishlist</button>
+                        </form>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>

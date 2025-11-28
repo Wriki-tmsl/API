@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Librarian Dashboard - Library Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <script src="{{ url_for('static', filename='librarian-dashboard.js') }}"></script>
+</head>
+<body>
+    <header>
+        <h1>Librarian Dashboard</h1>
+    </header>
+    <main class="lms-showcase">
+        <section>
+            <h2>Manage Books</h2>
+            <form action="/add-book" method="post">
+                <input name="title" placeholder="Title" required>
+                <input name="author" placeholder="Author" required>
+                <input name="isbn" placeholder="ISBN" required>
+                <input name="quantity" type="number" placeholder="Quantity" required>
+                <button type="submit">Add New Book</button>
+            </form>
+            <form action="/update-book" method="post">
+                <input name="id" type="number" placeholder="Book ID" required>
+                <input name="title" placeholder="New Title">
+                <input name="author" placeholder="New Author">
+                <input name="isbn" placeholder="New ISBN">
+                <input name="quantity" type="number" placeholder="New Quantity">
+                <button type="submit">Update Book Info</button>
+            </form>
+            <form action="/remove-book" method="post">
+                <input name="id" type="number" placeholder="Book ID" required>
+                <button type="submit">Remove Book</button>
+            </form>
+            {% if book_message %}
+                <div>{{ book_message }}</div>
+            {% endif %}
+        </section>
+        <section>
+            <h2>Recent Transactions</h2>
+            <table class="profile-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>User</th>
+                        <th>Book</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tx in transactions %}
+                    <tr>
+                        <td>{{ tx.date }}</td>
+                        <td>{{ tx.user }}</td>
+                        <td>{{ tx.book }}</td>
+                        <td>{{ tx.action }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+        <section>
+            <h2>Member Management</h2>
+            <form action="/add-member" method="post">
+                <input name="name" placeholder="Name" required>
+                <input name="email" placeholder="Email" required>
+                <button type="submit">Add Member</button>
+            </form>
+            <form action="/update-member" method="post">
+                <input name="id" type="number" placeholder="Member ID" required>
+                <input name="name" placeholder="New Name">
+                <input name="email" placeholder="New Email">
+                <button type="submit">Update Member Info</button>
+            </form>
+            <form action="/remove-member" method="post">
+                <input name="id" type="number" placeholder="Member ID" required>
+                <button type="submit">Remove Member</button>
+            </form>
+            {% if member_message %}
+                <div>{{ member_message }}</div>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

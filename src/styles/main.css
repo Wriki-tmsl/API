@@ -1,0 +1,75 @@
+.lms-showcase {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.lms-showcase h2 {
+    color: #333;
+    text-align: center;
+}
+
+.course-list {
+    margin-bottom: 30px;
+}
+
+.course-list h3 {
+    color: #007BFF;
+    margin-bottom: 10px;
+}
+
+.course-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.course-list li {
+    margin-bottom: 15px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.course-list h4 {
+    color: #333;
+}
+
+.enroll-button {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #28a745;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.enroll-button:hover {
+    background-color: #218838;
+}
+
+.testimonials {
+    background-color: #e9ecef;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.testimonials h3 {
+    color: #007BFF;
+}
+
+.testimonials blockquote {
+    margin: 10px 0;
+    padding: 10px;
+    border-left: 5px solid #007BFF;
+    background-color: #fff;
+}
+
+.testimonials footer {
+    text-align: right;
+    font-style: italic;
+    color: #555;
+}

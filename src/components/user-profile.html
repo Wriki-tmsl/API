@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Profile - Library Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+    <header>
+        <h1>User Profile</h1>
+    </header>
+    <main class="lms-showcase">
+        <div>
+            <p><strong>Name:</strong> {{ user.name }}</p>
+            <p><strong>Membership ID:</strong> {{ user.membership_id }}</p>
+        </div>
+        <section>
+            <h3>Current Borrowed Books</h3>
+            <ul>
+                {% for book in user.borrowed_books %}
+                <li>
+                    {{ book.title }} ({{ book.library }}) - Due: {{ book.due }}
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+        <section>
+            <h3>Transaction History</h3>
+            <table class="profile-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Book</th>
+                        <th>Library</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tx in user.transactions %}
+                    <tr>
+                        <td>{{ tx.date }}</td>
+                        <td>{{ tx.book }}</td>
+                        <td>{{ tx.library }}</td>
+                        <td>{{ tx.status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </main>
+</body>
+</html>
