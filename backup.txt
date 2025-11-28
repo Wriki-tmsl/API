@@ -1,0 +1,324 @@
+'''
+# Create a book
+@app.route('/books', methods=['POST'])
+def create_book():
+    """Adds a new book to the database."""
+    new_book = request.json
+    title = new_book.get('title')
+    author = new_book.get('author')
+    isbn = new_book.get('isbn')
+    quantity = new_book.get('quantity')
+
+    if not all([title, author, isbn, quantity is not None]):
+        return jsonify({"error": "Missing required fields (title, author, isbn, quantity)"}), 400
+
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "Database connection failed"}), 500
+
+    try:
+        cursor = conn.cursor()
+        query = "INSERT INTO books (title, author, isbn, quantity) VALUES (%s, %s, %s, %s)"
+        cursor.execute(query, (title, author, isbn, quantity))
+        conn.commit()
+        book_id = cursor.lastrowid
+        return jsonify({"message": "Book created successfully", "id": book_id}), 201
+    except mysql.connector.Error as err:
+        return jsonify({"error": f"Database error: {err}"}), 500
+    finally:
+        if conn:
+            conn.close()
+
+
+# Get all books or search by author/title
+@app.route('/books', methods=['GET'])
+def get_books():
+    """
+    Retrieves all books. Supports search by 'author' or 'title' query parameters.
+    Example: GET /books?author=J.K. Rowling
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "Database connection failed"}), 500
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+        query = "SELECT * FROM books"
+        params = [] 
+
+        search_title = request.args.get('title')
+        search_author = request.args.get('author')
+
+        if search_title and search_author:
+            query += " WHERE title LIKE %s AND author LIKE %s"
+            params = [f"%{search_title}%", f"%{search_author}%"]
+        elif search_title:
+            query += " WHERE title LIKE %s"
+            params = [f"%{search_title}%"]
+        elif search_author:
+            query += " WHERE author LIKE %s"
+            params = [f"%{search_author}%"]
+
+        cursor.execute(query, params)
+        books = cursor.fetchall()
+        return jsonify(books), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": f"Database error: {err}"}), 500
+    finally:
+        if conn:
+            conn.close()
+
+
+# Get a single book by ID
+@app.route('/books/<int:book_id>', methods=['GET'])
+def get_book_by_id(book_id):
+    """Retrieves a single book by its ID."""
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "Database connection failed"}), 500
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+        query = "SELECT * FROM books WHERE id = %s"
+        cursor.execute(query, (book_id,))
+        book = cursor.fetchone()
+
+        if book:
+            return jsonify(book), 200
+        else:
+            return jsonify({"error": "Book not found"}), 404
+    except mysql.connector.Error as err:
+        return jsonify({"error": f"Database error: {err}"}), 500
+    finally:
+        if conn:
+            conn.close()
+
+
+# Update a book
+@app.route('/books/<int:book_id>', methods=['PUT'])
+def update_book(book_id):
+    """Updates an existing book's details."""
+    updated_data = request.json
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "Database connection failed"}), 500
+
+    try:
+        cursor = conn.cursor()
+        # Check if the book exists
+        cursor.execute("SELECT id FROM books WHERE id = %s", (book_id,))
+        if not cursor.fetchone():
+            return jsonify({"error": "Book not found"}), 404
+
+        # Build dynamic update query
+        set_clause = []
+        params = []
+        for key, value in updated_data.items():
+            if key in ['title', 'author', 'isbn', 'quantity']:
+                set_clause.append(f"{key} = %s")
+                params.append(value)
+
+        if not set_clause:
+            return jsonify({"error": "No valid fields to update"}), 400
+
+        query = f"UPDATE books SET {', '.join(set_clause)} WHERE id = %s"
+        params.append(book_id)
+        cursor.execute(query, tuple(params))
+        conn.commit()
+
+        return jsonify({"message": "Book updated successfully"}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": f"Database error: {err}"}), 500
+    finally:
+        if conn:
+            conn.close()
+
+
+# Delete a book
+@app.route('/books/<int:book_id>', methods=['DELETE'])
+def delete_book(book_id):
+    """Deletes a book by its ID."""
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "Database connection failed"}), 500
+
+    try:
+        cursor = conn.cursor()
+        query = "DELETE FROM books WHERE id = %s"
+        cursor.execute(query, (book_id,))
+        conn.commit()
+
+        if cursor.rowcount == 0:
+            return jsonify({"error": "Book not found"}), 404
+
+        return jsonify({"message": "Book deleted successfully"}), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": f"Database error: {err}"}), 500
+    finally:
+        if conn:
+            conn.close()
+
+
+# Create a member
+@app.route('/members', methods=['POST'])
+def create_member():
+    """Adds a new member to the database."""
+    new_member = request.json
+    name = new_member.get('name')
+    email = new_member.get('email')
+
+    if not all([name, email]):
+        return jsonify({"error": "Missing required fields (name, email)"}), 400
+
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "Database connection failed"}), 500
+
+    try:
+        cursor = conn.cursor()
+        query = "INSERT INTO members (name, email) VALUES (%s, %s)"
+        cursor.execute(query, (name, email))
+        conn.commit()
+        member_id = cursor.lastrowid
+        return jsonify({"message": "Member created successfully", "id": member_id}), 201
+    except mysql.connector.Error as err:
+        return jsonify({"error": f"Database error: {err}"}), 500
+    finally:
+        if conn:
+            conn.close()
+
+
+# Get all members
+@app.route('/members', methods=['GET'])
+def get_members():
+    """Retrieves all members from the database."""
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "Database connection failed"}), 500
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+        query = "SELECT * FROM members"
+        cursor.execute(query)
+        members = cursor.fetchall()
+        return jsonify(members), 200
+    except mysql.connector.Error as err:
+        return jsonify({"error": f"Database error: {err}"}), 500
+    finally:
+        if conn:
+            conn.close()
+
+
+# Borrow a book
+@app.route('/borrow', methods=['POST'])
+def borrow_book():
+    """
+    Handles the process of a member borrowing a book.
+    Requires 'member_id' and 'book_id' in the request body.
+    """
+    data = request.json
+    member_id = data.get('member_id')
+    book_id = data.get('book_id')
+
+    if not all([member_id, book_id]):
+        return jsonify({"error": "Missing required fields (member_id, book_id)"}), 400
+
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "Database connection failed"}), 500
+
+    try:
+        cursor = conn.cursor()
+        
+        # Check if the book and member exist and if the book is available
+        query_check = """
+            SELECT quantity FROM books WHERE id = %s FOR UPDATE;
+        """
+        cursor.execute(query_check, (book_id,))
+        book = cursor.fetchone()
+
+        if not book:
+            conn.rollback()
+            return jsonify({"error": "Book not found"}), 404
+        if book[0] <= 0:
+            conn.rollback()
+            return jsonify({"error": "Book is currently out of stock"}), 400
+        
+        cursor.execute("SELECT id FROM members WHERE id = %s", (member_id,))
+        if not cursor.fetchone():
+            conn.rollback()
+            return jsonify({"error": "Member not found"}), 404
+
+        # Check if the member has already borrowed this book
+        query_borrowed = "SELECT id FROM borrowed_books WHERE member_id = %s AND book_id = %s AND returned = 0"
+        cursor.execute(query_borrowed, (member_id, book_id))
+        if cursor.fetchone():
+            conn.rollback()
+            return jsonify({"error": "This member has already borrowed a copy of this book"}), 400
+        
+        # Insert a new record in borrowed_books and decrement the book quantity
+        query_insert = "INSERT INTO borrowed_books (member_id, book_id) VALUES (%s, %s)"
+        cursor.execute(query_insert, (member_id, book_id))
+        
+        query_update_book = "UPDATE books SET quantity = quantity - 1 WHERE id = %s"
+        cursor.execute(query_update_book, (book_id,))
+
+        conn.commit()
+        return jsonify({"message": "Book borrowed successfully"}), 200
+    except mysql.connector.Error as err:
+        conn.rollback()
+        return jsonify({"error": f"Database error: {err}"}), 500
+    finally:
+        if conn:
+            conn.close()
+
+
+# Return a book
+@app.route('/return', methods=['POST'])
+def return_book():
+    """
+    Handles the process of a member returning a book.
+    Requires 'member_id' and 'book_id' in the request body.
+    """
+    data = request.json
+    member_id = data.get('member_id')
+    book_id = data.get('book_id')
+
+    if not all([member_id, book_id]):
+        return jsonify({"error": "Missing required fields (member_id, book_id)"}), 400
+
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "Database connection failed"}), 500
+
+    try:
+        cursor = conn.cursor()
+        
+        # Find an unreturned borrowed book record
+        query_find = "SELECT id FROM borrowed_books WHERE member_id = %s AND book_id = %s AND returned = 0"
+        cursor.execute(query_find, (member_id, book_id))
+        borrowed_record = cursor.fetchone()
+
+        if not borrowed_record:
+            conn.rollback()
+            return jsonify({"error": "Borrowed book record not found or already returned"}), 404
+        
+        # Update the borrowed record and increment the book quantity
+        query_update_borrowed = "UPDATE borrowed_books SET returned = 1 WHERE id = %s"
+        cursor.execute(query_update_borrowed, (borrowed_record[0],))
+        
+        query_update_book = "UPDATE books SET quantity = quantity + 1 WHERE id = %s"
+        cursor.execute(query_update_book, (book_id,))
+
+        conn.commit()
+        return jsonify({"message": "Book returned successfully"}), 200
+    except mysql.connector.Error as err:
+        conn.rollback()
+        return jsonify({"error": f"Database error: {err}"}), 500
+    finally:
+        if conn:
+            conn.close()
+
+
+
+'''

@@ -1,0 +1,22 @@
+{
+  "name": "lms-portfolio-website",
+  "version": "1.0.0",
+  "description": "A portfolio website for a Library Management System showcasing featured courses and user testimonials.",
+  "main": "src/index.html",
+  "scripts": {
+    "start": "live-server src",
+    "build": "echo 'Build step not defined'",
+    "test": "echo 'No tests defined'"
+  },
+  "keywords": [
+    "LMS",
+    "Library Management System",
+    "portfolio",
+    "education"
+  ],
+  "author": "Abhiraj Banerjee",
+  "dependencies": {},
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  }
+}
