@@ -26,8 +26,8 @@ All database operations are handled via a dedicated API server.
 Create the required tables and insert mock data:
 
 ```sh
-mysql -u tranzsilica -p library < setup/create_tables.sql
-mysql -u tranzsilica -p library < setup/insert_mock_data.sql
+mysql -u user -p library < setup/create_tables.sql
+mysql -u user -p library < setup/insert_mock_data.sql
 ```
 
 ### 2. API Server
